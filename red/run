@@ -1,2 +1,3 @@
 #!/bin/bash
-exec ./red.sh $(dirname $0)/${STEP:-stepA_mal}.red "${@}"
+#cat /dev/stdin | exec $(dirname $0)/red.sh $(dirname $0)/${STEP:-stepA_mal}.red "${@}"
+exec $(dirname $0)/red.sh $(dirname $0)/${STEP:-stepA_mal}.red "${@}"
