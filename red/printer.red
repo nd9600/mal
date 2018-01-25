@@ -3,10 +3,9 @@ Red [
 ]
 
 read_str: function [
-	str [string!] "the input string"
+	obj
 ] [
-	new_reader: make Reader [
-		tokens: tokenizer str
+	case [
+		
 	]
-	read_form new_reader
 ]
