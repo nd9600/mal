@@ -27,6 +27,19 @@ tokenizer: function [
 	str [string!] "the input string"
 ] [
 	; [\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)
+	; thru any whitespace or comma
+	; collect one ~@ together
+	; collect one of []{}()'`~^@  - special characters
+	; collect from " to ", excludes \" any times
+	; collect any sequence of characters except newlines that start with ;
+	; collect any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters, as \s means whitespace
+
+	first_group: [newline | cr | lf | "^(0C)" | tab | space | comma] ; 0C is form feed, see https://www.pcre.org/original/doc/html/pcrepattern.html
+
+	tilde_at: "~@"
+	special_characters: ["[" | "]" | "^{" | "^}" | "(" | ")" | "'" | "`" | "~" | "^^" | "@"]
+	any_characters_except_newlines: charset reduce ['not newline cr lf "^0C"]
+	non_special_characters: charset reduce ['not newline cr lf "^0C" tab space "[]^{^}('^"`,;"]
 ]
 
 read_form: function [
