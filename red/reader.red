@@ -121,8 +121,8 @@ read_atom: function [
 make_string: function [
 	token [string!]
 ] [
-	double_quotes_replaced: replace/all token "\n" newline
-	newlines_replaced: replace/all double_quotes_replaced "\^"" "^""
-	backslashes_replaced: replace/all newlines_replaced "\\" "\"
+	newlines_replaced: replace/all token "\n" newline
+	double_quotes_replaced: replace/all newlines_replaced "\^"" "^""
+	backslashes_replaced: replace/all double_quotes_replaced "\\" "\"
 	return make MalString [data: backslashes_replaced]
 ]
