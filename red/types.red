@@ -26,6 +26,11 @@ MalInteger: make MalType [
 	data: 0
 ]
 
+MalString: make MalType [
+	type: append self/type "MalString"
+	data: copy ""
+]
+
 MalList: make MalType [
 	type: append self/type "MalList"
 	data: copy []

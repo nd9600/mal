@@ -105,11 +105,24 @@ read_atom: function [
 	current_reader [object!] "the current reader"
 ] [
 	digit: charset "0123456789"
+	thru_escaped_double_quote: [any [thru "\^""]]
+	string: ["^"" thru_escaped_double_quote thru "^""]
+
 	token: current_reader/peek
 	case [
 		token == "nil" [return make MalNil []]
 		(parse token ["true" | "false"]) [return make MalBoolean [data: either (token == "true") [true][false]] ]
 		(parse token [some digit]) [return make MalInteger [data: to-integer token]]
+		(parse token string) [return make_string token]
 		true [return make MalSymbol [data: token]]
 	]
+]
+
+make_string: function [
+	token [string!]
+] [
+	double_quotes_replaced: replace/all token "\n" newline
+	newlines_replaced: replace/all double_quotes_replaced "\^"" "^""
+	backslashes_replaced: replace/all newlines_replaced "\\" "\"
+	return make MalString [data: backslashes_replaced]
 ]
