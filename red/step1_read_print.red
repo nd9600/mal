@@ -12,6 +12,18 @@ do %functional.red
 do %reader.red
 do %printer.red
 
+parens_match: function [
+	str [string!]
+] [
+	parens: copy rejoin parse str [collect [any [keep "(" | keep ")" | skip] ]]
+	counter: 0
+	foreach paren parens [
+		if counter < 0 [return false]
+		either paren == #"(" [counter: counter + 1] [counter: counter - 1]
+	]
+	counter
+]
+
 READ: function [
 	str [string!] "the input string"
 ] [
@@ -40,12 +52,16 @@ do %step1_tests.red
 
 forever [
 	characters: to-string ask "user> "
-	
-	either any [characters == "^["] [
-		break
-	] [
-		result: rep characters
-		rejoin ["result: " mold result]
-		print_backup result
+
+	case [
+		characters == "^[" [ break ]
+		((num: parens_match characters) <> 0) [
+			either (num < 0) [print_backup "expected '(', got EOF"] [print_backup "expected ')', got EOF"]
+		]
+	    true [
+			result: rep characters
+			rejoin ["result: " mold result]
+			print_backup result
+		]
 	]
 ]

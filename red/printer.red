@@ -18,6 +18,7 @@ pr_str: function [
 	;print_backup rejoin ["#####^/obj: " obj "^/#####^/"]
 	case [
 		obj/is_type "MalSymbol" [return obj/data]
+		obj/is_type "MalBoolean" [return to-string obj/data]
 		obj/is_type "MalInteger" [return to-string obj/data]
 		obj/is_type "MalList" [
 			middle: rejoin separate (f_map lambda [pr_str ?] obj/data) " "

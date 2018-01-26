@@ -12,6 +12,11 @@ MalSymbol: make MalType [
 	data: copy ""
 ]
 
+MalBoolean: make MalType [
+	type: append self/type "MalBoolean"
+	data: false
+]
+
 MalInteger: make MalType [
 	type: append self/type "MalInteger"
 	data: 0

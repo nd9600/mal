@@ -92,11 +92,9 @@ read_form: function [
 read_list: function [
 	current_reader [object!] "the current reader"
 ] [
-	;print_backup rejoin ["list, token: " current_reader/peek]
 	current_reader/next
 	list: make MalList []
 	while [current_reader/peek <> ")"] [
-		;print_backup rejoin ["token: " current_reader/peek]
 		list/_append read_form current_reader 
 		current_reader/next 
 	]
@@ -110,6 +108,7 @@ read_atom: function [
 	token: current_reader/peek
 	case [
 		(parse token [some digit]) [return make MalInteger [data: to-integer token]]
+		(parse token ["true" | "false"]) [return make MalBoolean [data: either (token == "true") [true][false]] ]
 		true [return make MalSymbol [data: token]]
 	]
 ]
