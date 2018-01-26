@@ -86,21 +86,37 @@ read_form: function [
 	first_token: current_reader/peek
 	switch/default first_token [
 		"(" [return read_list current_reader]
+		"[" [return read_vector current_reader]
 	] [
 		return read_atom current_reader
 	]
 ]
 
+read_sequence: function [
+	current_reader [object!] "the current reader"
+	sequence [object!] "the initially empty sequence"
+	final_token [string!] "the token that marks the end of the sequence"
+] [
+	current_reader/next
+	while [current_reader/peek <> final_token] [
+		sequence/_append read_form current_reader 
+		current_reader/next 
+	]
+	sequence
+]
+
 read_list: function [
 	current_reader [object!] "the current reader"
 ] [
-	current_reader/next
 	list: make MalList []
-	while [current_reader/peek <> ")"] [
-		list/_append read_form current_reader 
-		current_reader/next 
-	]
-	list
+	read_sequence current_reader list ")"
+]
+
+read_vector: function [
+	current_reader [object!] "the current reader"
+] [
+	vector: make MalVector []
+	read_sequence current_reader vector "]"
 ]
 
 read_atom: function [

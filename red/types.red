@@ -31,9 +31,17 @@ MalString: make MalType [
 	data: copy ""
 ]
 
-MalList: make MalType [
-	type: append self/type "MalList"
+MalSequence: make MalType [
+	type: append self/type "MalSequence"
 	data: copy []
 	_append: function [element] [append/only data element data]
 	_get: function [index [integer!]] [data/(index)]
+]
+
+MalList: make MalSequence [
+	type: append self/type "MalList"
+]
+
+MalVector: make MalSequence [
+	type: append self/type "MalVector"
 ]

@@ -18,9 +18,12 @@ pr_str: function [
 ] [
 	;print_backup rejoin ["#####^/obj: " obj "^/#####^/"]
 	case [
-		obj/is_type "MalList" [
+		obj/is_type "MalSequence" [
 			middle: rejoin separate (f_map lambda [pr_str ?] obj/data) " "
-			return rejoin ["(" middle ")"]
+			case [
+				obj/is_type "MalList" [return rejoin ["(" middle ")"]]
+				obj/is_type "MalVector" [return rejoin ["[" middle "]"]]
+			]
 		]
 		obj/is_type "MalNil" [return "nil"]
 		obj/is_type "MalBoolean" [return to-string obj/data]

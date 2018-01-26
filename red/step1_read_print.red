@@ -12,14 +12,16 @@ do %functional.red
 do %reader.red
 do %printer.red
 
-parens_match: function [
+brackets_match: function [
 	str [string!]
+	opening_char [char!]
+	ending_char [char!]
 ] [
-	parens: copy rejoin parse str [collect [any [keep "(" | keep ")" | skip] ]]
+	brackets: copy rejoin parse str [collect [any [keep opening_char | keep ending_char | skip] ]]
 	counter: 0
-	foreach paren parens [
+	foreach bracket brackets [
 		if counter < 0 [return false]
-		either paren == #"(" [counter: counter + 1] [counter: counter - 1]
+		either bracket == opening_char [counter: counter + 1] [counter: counter - 1]
 	]
 	counter
 ]
@@ -55,8 +57,11 @@ forever [
 
 	case [
 		characters == "^[" [ break ]
-		((num: parens_match characters) <> 0) [
-			either (num < 0) [print_backup "expected '(', got EOF"] [print_backup "expected ')', got EOF"]
+		((num: brackets_match characters #"(" #")") <> 0) [
+			either (num < 0) [print_backup "expected '('"] [print_backup "expected ')', got EOF"]
+		]
+		((num: brackets_match characters #"[" #"]") <> 0) [
+			either (num < 0) [print_backup "expected '['"] [print_backup "expected ']', got EOF"]
 		]
 	    true [
 	    	try/all [
