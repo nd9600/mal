@@ -17,6 +17,10 @@ MalBoolean: make MalType [
 	data: false
 ]
 
+MalNil: make MalType [
+	type: append self/type "MalNil"
+]
+
 MalInteger: make MalType [
 	type: append self/type "MalInteger"
 	data: 0

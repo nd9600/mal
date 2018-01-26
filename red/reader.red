@@ -107,8 +107,9 @@ read_atom: function [
 	digit: charset "0123456789"
 	token: current_reader/peek
 	case [
-		(parse token [some digit]) [return make MalInteger [data: to-integer token]]
+		token == "nil" [return make MalNil []]
 		(parse token ["true" | "false"]) [return make MalBoolean [data: either (token == "true") [true][false]] ]
+		(parse token [some digit]) [return make MalInteger [data: to-integer token]]
 		true [return make MalSymbol [data: token]]
 	]
 ]
