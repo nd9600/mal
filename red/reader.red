@@ -63,7 +63,7 @@ tokenizer: function [
 			|
 			    keep between_double_quotes
 			|
-				keep [";" any characters_except_newlines]
+				[";" any characters_except_newlines]
 			|
 				keep some non_special_characters
 			]
@@ -81,6 +81,8 @@ tokenizer: function [
 read_form: function [
 	current_reader [object!] "the current reader"
 ] [
+	if empty? current_reader/tokens [throw "blank line"] ;if just a comment is entered
+
 	first_token: current_reader/peek
 	switch/default first_token [
 		"(" [return read_list current_reader]

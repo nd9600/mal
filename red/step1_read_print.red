@@ -59,9 +59,11 @@ forever [
 			either (num < 0) [print_backup "expected '(', got EOF"] [print_backup "expected ')', got EOF"]
 		]
 	    true [
-			result: rep characters
-			rejoin ["result: " mold result]
-			print_backup result
+	    	try/all [
+				result: rep characters
+				rejoin ["result: " mold result]
+				print_backup result
+			]
 		]
 	]
 ]
