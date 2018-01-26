@@ -6,9 +6,8 @@ separate: function [
 	block [block!]
 	separator [string!]
 ] [
-	until [
+	while [not tail? next block] [
 		block: insert next block copy separator
-		tail? next block
 	]
 	block: head block
 ]

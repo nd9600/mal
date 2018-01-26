@@ -4,7 +4,7 @@ Red [
 
 MalType: make object! [
 	type: copy ["MalType"]
-	is_type: function [type [string!]] [not none? find self/type type]
+	is_type: function [type_string [string!]] [not none? find self/type type_string]
 ]
 
 MalSymbol: make MalType [
