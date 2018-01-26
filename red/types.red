@@ -12,23 +12,8 @@ MalSymbol: make MalType [
 	data: copy ""
 ]
 
-MalBoolean: make MalType [
-	type: append self/type "MalBoolean"
-	data: false
-]
-
 MalNil: make MalType [
 	type: append self/type "MalNil"
-]
-
-MalInteger: make MalType [
-	type: append self/type "MalInteger"
-	data: 0
-]
-
-MalString: make MalType [
-	type: append self/type "MalString"
-	data: copy ""
 ]
 
 MalSequence: make MalType [

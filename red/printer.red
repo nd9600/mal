@@ -13,11 +13,24 @@ separate: function [
 ]
 
 pr_str: function [
-	obj [object!] "the Mal data structure to print"
+	obj "the Mal data structure to print"
 	/print_readably "print out the string in a form that can be machine-read"
 ] [
 	;print_backup rejoin ["#####^/obj: " obj "^/#####^/"]
 	case [
+		logic? obj [return to-string obj]
+		integer? obj [return to-string obj]
+		string? obj [
+			either print_readably [
+				part_to_replace: copy/part next obj ((length? obj) - 2)
+				backslashes_replaced: replace/all part_to_replace "\" "\\" ; we must replace the backslashes first as it would add in extra ones otherwise
+				double_quotes_replaced: replace/all backslashes_replaced "^"" "\^""
+				newlines_replaced: replace/all double_quotes_replaced newline "\n"
+				return rejoin ["^"" newlines_replaced "^""]
+			] [
+				return obj
+			]
+		]
 		obj/is_type "MalSequence" [
 			middle: rejoin separate (f_map lambda [pr_str ?] obj/data) " "
 			case [
@@ -26,19 +39,6 @@ pr_str: function [
 			]
 		]
 		obj/is_type "MalNil" [return "nil"]
-		obj/is_type "MalBoolean" [return to-string obj/data]
-		obj/is_type "MalInteger" [return to-string obj/data]
-		obj/is_type "MalString" [
-			either print_readably [
-				part_to_replace: copy/part next obj/data ((length? obj/data) - 2)
-				backslashes_replaced: replace/all part_to_replace "\" "\\" ; we must replace the backslashes first as it would add in extra ones otherwise
-				double_quotes_replaced: replace/all backslashes_replaced "^"" "\^""
-				newlines_replaced: replace/all double_quotes_replaced newline "\n"
-				return rejoin ["^"" newlines_replaced "^""]
-			] [
-				return obj/data
-			]
-		]
 		obj/is_type "MalSymbol" [return obj/data]
 	]
 ]

@@ -128,10 +128,10 @@ read_atom: function [
 
 	token: current_reader/peek
 	case [
-		token == "nil" [return make MalNil []]
-		(parse token ["true" | "false"]) [return make MalBoolean [data: either (token == "true") [true][false]] ]
-		(parse token [some digit]) [return make MalInteger [data: to-integer token]]
+		(parse token [some digit]) [return to-integer token]
 		(parse token string) [return make_string token]
+		token == "nil" [return make MalNil []]
+		(parse token ["true" | "false"]) [return either (token == "true") [true][false] ]
 		true [return make MalSymbol [data: token]]
 	]
 ]
@@ -142,5 +142,4 @@ make_string: function [
 	newlines_replaced: replace/all token "\n" newline
 	double_quotes_replaced: replace/all newlines_replaced "\^"" "^""
 	backslashes_replaced: replace/all double_quotes_replaced "\\" "\"
-	return make MalString [data: backslashes_replaced]
 ]
