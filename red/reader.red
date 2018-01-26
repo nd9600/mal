@@ -94,12 +94,14 @@ read_form: function [
 read_list: function [
 	current_reader [object!] "the current reader"
 ] [
-	first_token: current_reader/next
-	list: copy reduce [first_token]
+	print_backup rejoin ["list, token: " current_reader/peek]
+	current_reader/next
+	list: copy []
 	until [
-		append list read_form current_reader
-		first_token: current_reader/next
-		first_token == ")"
+		print_backup rejoin ["token: " current_reader/peek]
+		append/only list read_form current_reader 
+		current_reader/next 
+		current_reader/peek == ")"
 	]
 	list
 ]
