@@ -36,11 +36,13 @@ tokenizer: function [
 	; or
 	;  one of []{}()'`~^@  - special characters
 	; or
-	;  from " to ", excludes \", any times
+	;  from " to ", skip through \"
 	; or
 	;  a comma and any sequence of characters except newlines
 	; or
 	;  any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters
+
+	; rebol/red escapes characters with "^", not "\"
 
 	whitespace_or_comma: [newline | cr | lf | "^(0C)" | tab | space | comma] ; 0C is form feed, see https://www.pcre.org/original/doc/html/pcrepattern.html
 	special_character: ["[" | "]" | "^{" | "^}" | "(" | ")" | "'" | "`" | "~" | "^^" | "@"]
