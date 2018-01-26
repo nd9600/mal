@@ -42,30 +42,35 @@ tokenizer: function [
 	;  any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters, as \s means whitespace
 
 	whitespace_or_comma: [newline | cr | lf | "^(0C)" | tab | space | comma] ; 0C is form feed, see https://www.pcre.org/original/doc/html/pcrepattern.html
-	special_characters: ["[" | "]" | "^{" | "^}" | "(" | ")" | "'" | "`" | "~" | "^^" | "@"]
+	special_character: ["[" | "]" | "^{" | "^}" | "(" | ")" | "'" | "`" | "~" | "^^" | "@"]
 
 	thru_escaped_double_quote: [any [thru "\^""]]
 	between_double_quotes: ["^"" thru_escaped_double_quote thru "^""]
 
 	characters_except_newlines: charset reduce ['not newline cr lf "^0C"]
-	non_special_characters: charset reduce ['not newline cr lf "^0C" tab space "[]^{^}('^"`,;"]
+	non_special_characters: charset reduce ['not newline cr lf "^0C" tab space "[]^{^}('^"`,;)"]
 
 	lexer_rules: [
+		any [
 		thru [any whitespace_or_comma]
-		collect [
+		collect any [
 					keep "~@"
 				|
-					keep special_characters
+					keep special_character
 				|
-					any keep between_double_quotes
+				    keep some between_double_quotes
 				|
 					keep [";" any characters_except_newlines]
 				|
-					any keep non_special_characters
+					keep some non_special_characters
+		]
 		]
 	]
 
+	;tokens are put into nested blocks sometimes
 	tokens: parse str lexer_rules
+	flattened_tokens: copy []
+	foreach token tokens [append flattened_tokens token]
 ]
 
 read_form: function [
