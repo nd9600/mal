@@ -2,6 +2,8 @@ Red [
     Title: "Red implementation of Mal - functional programming functions"
 ]
 
+apply: function [f x][f x]
+
 lambda: function [
         "makes lambda functions - https://gist.github.com/draegtun/11b0258377a3b49bfd9dc91c3a1c8c3d"
         block [block!] "the function to make"
@@ -23,7 +25,7 @@ lambda: function [
     
     if all [
         (length? spec) > 1
-        found? find spec '?
+        not none? find spec '?
     ] [ 
         do make error! {cannot match ? with ?name placeholders}
     ]
