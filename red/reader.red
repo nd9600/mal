@@ -95,11 +95,10 @@ read_list: function [
 	;print_backup rejoin ["list, token: " current_reader/peek]
 	current_reader/next
 	list: make MalList []
-	until [
+	while [current_reader/peek <> ")"] [
 		;print_backup rejoin ["token: " current_reader/peek]
 		list/_append read_form current_reader 
 		current_reader/next 
-		current_reader/peek == ")"
 	]
 	list
 ]
