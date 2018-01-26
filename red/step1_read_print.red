@@ -36,7 +36,7 @@ rep: function [
 	PRINT EVAL READ str
 ]
 
-;do %step1_tests.red
+do %step1_tests.red
 
 forever [
 	characters: to-string ask "user> "

@@ -65,7 +65,7 @@ assert [ (rep "false") == "false" ]
 ;; Testing read of strings
 assert [ (rep "^"abc^"") == "^"abc^"" ]
 ;=>"abc"
-assert [ (rep "^"   abc   ^"") == "^"abc^"" ]
+assert [ (rep "   ^"abc^"   ") == "^"abc^"" ]
 ;=>"abc"
 assert [ (rep "^"abc (with parens)^"") == "^"abc (with parens)^"" ]
 ;=>"abc (with parens)"
