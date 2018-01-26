@@ -1,5 +1,5 @@
 Red [
-    Title: "Red implementation of step 1 of the Mal Lisp"
+    Title: "Red implementation of step 2 of the Mal Lisp"
 ]
 
 system/options/quiet: true
@@ -26,6 +26,12 @@ brackets_match: function [
 	counter
 ]
 
+repl_env: make map! []
+repl_env/+: lambda [?x + ?y]
+repl_env/-: lambda [?x - ?y]
+repl_env/*: lambda [?x * ?y]
+repl_env/('/): lambda [?x / ?y]
+
 READ: function [
 	str [string!] "the input string"
 ] [
@@ -46,11 +52,12 @@ PRINT: function [
 
 rep: function [
 	str [string!] "the input string"
+	env [map!] "the REPL environment"
 ] [
 	PRINT EVAL READ str
 ]
 
-do %step1_tests.red
+do %step2_tests.red
 
 forever [
 	characters: to-string ask "user> "
@@ -65,7 +72,7 @@ forever [
 		]
 	    true [
 	    	try/all [
-				result: rep characters
+				result: rep characters repl_env
 				rejoin ["result: " mold result]
 				print_backup result
 			]
