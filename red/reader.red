@@ -28,7 +28,8 @@ tokenizer: function [
 	str [string!] "the input string"
 ] [
 	; [\s,]* ( ~@ | [\[\]{}()'`~^@] | "(?:\\. | [^\\"])*" | ;.* | [^\s\[\]{}('"`,;)]* )
-	; thru any whitespace or comma
+	;any times
+	; thru any whitespace or comma - "\s" means whitespace
 	;then
 	;collect 
 	;  one ~@ together
@@ -37,9 +38,9 @@ tokenizer: function [
 	; or
 	;  from " to ", excludes \", any times
 	; or
-	;  any sequence of characters except newlines that start with ;
+	;  a comma and any sequence of characters except newlines
 	; or
-	;  any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters, as \s means whitespace
+	;  any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters
 
 	whitespace_or_comma: [newline | cr | lf | "^(0C)" | tab | space | comma] ; 0C is form feed, see https://www.pcre.org/original/doc/html/pcrepattern.html
 	special_character: ["[" | "]" | "^{" | "^}" | "(" | ")" | "'" | "`" | "~" | "^^" | "@"]
@@ -51,26 +52,31 @@ tokenizer: function [
 	non_special_characters: charset reduce ['not newline cr lf "^0C" tab space "[]^{^}('^"`,;)"]
 
 	lexer_rules: [
-		any [
-		thru [any whitespace_or_comma]
-		collect any [
-					keep "~@"
-				|
-					keep special_character
-				|
-				    keep some between_double_quotes
-				|
-					keep [";" any characters_except_newlines]
-				|
-					keep some non_special_characters
-		]
+		any [ ; the regex seems to repeat until you get to the end of the string, so we have to put in an 'any here
+			thru [any whitespace_or_comma]
+			collect any [
+						keep "~@"
+					|
+						keep special_character
+					|
+					    keep some between_double_quotes
+					|
+						keep [";" any characters_except_newlines]
+					|
+						keep some non_special_characters
+			]
 		]
 	]
 
-	;tokens are put into nested blocks sometimes
+	;tokens are put into nested blocks sometimes, this puts them all into a flat block, as strings, rather than occasionally chars
 	tokens: parse str lexer_rules
 	flattened_tokens: copy []
 	foreach token tokens [append flattened_tokens token]
+
+	tokens_as_strings: copy []
+	foreach token flattened_tokens [append tokens_as_strings to-string token]
+
+	tokens_as_strings
 ]
 
 read_form: function [
