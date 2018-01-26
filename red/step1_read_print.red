@@ -7,20 +7,24 @@ system/options/quiet: true
 read_backup: :read
 print_backup: :print
 
+do %reader.red
+
 READ: function [
 	str [string!] "the input string"
 ] [
-	str
+	data: read_str str
+	probe data
+	data
 ]
 
 EVAL: function [
-	str [string!] "the input string"
+	str "the input string"
 ] [
 	str
 ]
 
 PRINT: function [
-	str [string!] "the input string"
+	str "the input string"
 ] [
 	str
 ]
@@ -33,11 +37,11 @@ rep: function [
 
 
 forever [
-	char: ask "user> "
+	characters: to-string ask "user> "
 	
-	either any [char == "^["] [
+	either any [characters == "^["] [
 		break
 	] [
-		print_backup rep char
+		print_backup rep characters
 	]
 ]
