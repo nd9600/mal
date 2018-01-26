@@ -7,7 +7,10 @@ system/options/quiet: true
 read_backup: :read
 print_backup: :print
 
+do %types.red
+do %functional.red
 do %reader.red
+do %printer.red
 
 READ: function [
 	str [string!] "the input string"
@@ -26,7 +29,7 @@ EVAL: function [
 PRINT: function [
 	str "the input string"
 ] [
-	str
+	pr_str str
 ]
 
 rep: function [

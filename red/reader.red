@@ -96,10 +96,10 @@ read_list: function [
 ] [
 	print_backup rejoin ["list, token: " current_reader/peek]
 	current_reader/next
-	list: copy []
+	list: make MalList []
 	until [
 		print_backup rejoin ["token: " current_reader/peek]
-		append/only list read_form current_reader 
+		list/_append read_form current_reader 
 		current_reader/next 
 		current_reader/peek == ")"
 	]
@@ -114,13 +114,7 @@ read_atom: function [
 
 	token: current_reader/peek
 	case [
-		(parse token [some digit]) [return to-integer token]
-		true [make_symbol token]
+		(parse token [some digit]) [return make MalInteger [data: to-integer token]]
+		true [return make MalSymbol [data: token]]
 	]
-]
-
-make_symbol: function [
-	token [string!]
-] [
-	token
 ]
