@@ -2,7 +2,10 @@ Red [
     Title: "Red implementation of Mal - functional programming functions"
 ]
 
-apply: function [f x][f x]
+;apply: function [f x][f x] ;monadic argument only
+;apply: func [f args][do head insert args 'f]
+;apply: func [f args][do append copy [f] args]
+apply: func [f args][do compose [f (args)] ]
 
 lambda: function [
         "makes lambda functions - https://gist.github.com/draegtun/11b0258377a3b49bfd9dc91c3a1c8c3d"
