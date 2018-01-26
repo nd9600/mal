@@ -24,22 +24,48 @@ read_str: function [
 ]
 
 tokenizer: function [
+	"lexes an input string"
 	str [string!] "the input string"
 ] [
-	; [\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)
+	; [\s,]* ( ~@ | [\[\]{}()'`~^@] | "(?:\\. | [^\\"])*" | ;.* | [^\s\[\]{}('"`,;)]* )
 	; thru any whitespace or comma
-	; collect one ~@ together
-	; collect one of []{}()'`~^@  - special characters
-	; collect from " to ", excludes \" any times
-	; collect any sequence of characters except newlines that start with ;
-	; collect any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters, as \s means whitespace
+	;then
+	;collect 
+	;  one ~@ together
+	; or
+	;  one of []{}()'`~^@  - special characters
+	; or
+	;  from " to ", excludes \", any times
+	; or
+	;  any sequence of characters except newlines that start with ;
+	; or
+	;  any sequence of characters that aren't whitespace or []{}('"`,;) - non-special characters, as \s means whitespace
 
-	first_group: [newline | cr | lf | "^(0C)" | tab | space | comma] ; 0C is form feed, see https://www.pcre.org/original/doc/html/pcrepattern.html
-
-	tilde_at: "~@"
+	whitespace_or_comma: [newline | cr | lf | "^(0C)" | tab | space | comma] ; 0C is form feed, see https://www.pcre.org/original/doc/html/pcrepattern.html
 	special_characters: ["[" | "]" | "^{" | "^}" | "(" | ")" | "'" | "`" | "~" | "^^" | "@"]
-	any_characters_except_newlines: charset reduce ['not newline cr lf "^0C"]
+
+	thru_escaped_double_quote: [any [thru "\^""]]
+	between_double_quotes: ["^"" thru_escaped_double_quote thru "^""]
+
+	characters_except_newlines: charset reduce ['not newline cr lf "^0C"]
 	non_special_characters: charset reduce ['not newline cr lf "^0C" tab space "[]^{^}('^"`,;"]
+
+	lexer_rules: [
+		thru [any whitespace_or_comma]
+		collect [
+					keep "~@"
+				|
+					keep special_characters
+				|
+					any keep between_double_quotes
+				|
+					keep [";" any characters_except_newlines]
+				|
+					any keep non_special_characters
+		]
+	]
+
+	tokens: parse str lexer_rules
 ]
 
 read_form: function [
