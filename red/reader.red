@@ -59,7 +59,7 @@ tokenizer: function [
 					|
 						keep special_character
 					|
-					    keep some between_double_quotes
+					    keep between_double_quotes
 					|
 						keep [";" any characters_except_newlines]
 					|
@@ -75,7 +75,6 @@ tokenizer: function [
 
 	tokens_as_strings: copy []
 	foreach token flattened_tokens [append tokens_as_strings to-string token]
-
 	tokens_as_strings
 ]
 
