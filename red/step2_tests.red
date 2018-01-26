@@ -1,5 +1,5 @@
 Red [
-	"Mal's step 1 tests, implemented in Red"
+	"Mal's step 2 tests, implemented in Red"
 ]
 
 do %testing.red

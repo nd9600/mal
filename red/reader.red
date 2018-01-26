@@ -2,27 +2,6 @@ Red [
     Title: "Red implementation of Reader for the Mal Lisp"
 ]
 
-Reader: make object! [
-	tokens: copy []
-	position: 1
-	next: function [] [
-		position: position + 1
-		tokens/(position - 1)
-	]
-	peek: function[] [
-		tokens/(position)
-	]
-]
-
-read_str: function [
-	str [string!] "the input string"
-] [
-	new_reader: make Reader [
-		tokens: tokenizer str
-	]
-	read_form new_reader
-]
-
 tokenizer: function [
 	"lexes an input string"
 	str [string!] "the input string"
@@ -78,10 +57,31 @@ tokenizer: function [
 	tokens_as_strings: f_map lambda [to-string ?] tokens
 ]
 
+Reader: make object! [
+	tokens: copy []
+	position: 1
+	next: function [] [
+		position: position + 1
+		tokens/(position - 1)
+	]
+	peek: function[] [
+		tokens/(position)
+	]
+]
+
+read_str: function [ [catch]
+	str [string!] "the input string"
+] [
+	new_reader: make Reader [
+		tokens: tokenizer str
+	]
+	read_form new_reader
+]
+
 read_form: function [
 	current_reader [object!] "the current reader"
 ] [
-	if empty? current_reader/tokens [throw "blank line"] ;if just a comment is entered
+	if empty? current_reader/tokens [do make error! "blank line"] ;if just a comment is entered
 
 	first_token: current_reader/peek
 	switch/default first_token [

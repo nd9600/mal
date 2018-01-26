@@ -12,6 +12,12 @@ do %functional.red
 do %reader.red
 do %printer.red
 
+repl_env: make map! []
+repl_env/+: lambda [?x + ?y]
+repl_env/-: lambda [?x - ?y]
+repl_env/*: lambda [?x * ?y]
+repl_env/('/): lambda [?x / ?y]
+
 brackets_match: function [
 	str [string!]
 	opening_char [char!]
@@ -26,11 +32,25 @@ brackets_match: function [
 	counter
 ]
 
-repl_env: make map! []
-repl_env/+: lambda [?x + ?y]
-repl_env/-: lambda [?x - ?y]
-repl_env/*: lambda [?x * ?y]
-repl_env/('/): lambda [?x / ?y]
+eval_ast: function [
+	ast "the Mal AST"
+	env [map!] "the REPL environment"
+] [
+	case [
+		logic? ast [ast]
+		integer? ast [ast]
+		string? ast [ast]
+		ast/is_type "MalList" [f_map lambda [EVAL ?] ast]
+		ast/is_type "MalSymbol" [
+			either (not none? select env obj/data) [
+				select env obj/data
+			] [
+				do make error! rejoin [obj/data ": symbol not found"]
+			]
+		]
+		true [ast]
+	]
+]
 
 READ: function [
 	str [string!] "the input string"
@@ -39,9 +59,25 @@ READ: function [
 ]
 
 EVAL: function [
-	str "the input string"
+	ast "the Mal AST"
+	env [map!] "the REPL environment"
 ] [
-	str
+	print_backup rejoin ["#####^/ast: " ast "^/#####^/"]
+	case [
+		logic? ast [eval_ast ast env]
+		integer? ast [eval_ast ast env]
+		string? ast [eval_ast ast env]
+		not ast/is_type "MalList" ast [eval_ast ast env]
+		empty? ast/data [ast]
+		true [ ;the AST will be a non-empty list here
+			print_backup rejoin ["#####^/unevaluated_list: " ast "^/#####^/"]
+			evaluated_list: eval_ast ast env
+			print_backup rejoin ["#####^/evaluated_list: " evaluated_list "^/#####^/"]
+			f: first evaluated_list/data
+			args: next evaluated_list/data
+			return apply f a
+		]
+	]	
 ]
 
 PRINT: function [
@@ -54,10 +90,10 @@ rep: function [
 	str [string!] "the input string"
 	env [map!] "the REPL environment"
 ] [
-	PRINT EVAL READ str
+	PRINT EVAL (READ str) env
 ]
 
-do %step2_tests.red
+;do %step2_tests.red
 
 forever [
 	characters: to-string ask "user> "
@@ -71,11 +107,17 @@ forever [
 			either (num < 0) [print_backup "expected '['"] [print_backup "expected ']', got EOF"]
 		]
 	    true [
-	    	try/all [
-				result: rep characters repl_env
-				rejoin ["result: " mold result]
+	    	if error? error: try [
+	    		result: rep characters repl_env
 				print_backup result
-			]
+				none ; 'print doesn't return anything, so this will (ironically) crash without this line
+	    	] [
+	    		switch/default error/arg1 [
+	    			"blank line" []
+	    		] [
+    				print_backup rejoin ["error: " error/arg1]
+    			]
+    		]
 		]
 	]
 ]
