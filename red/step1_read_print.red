@@ -39,7 +39,7 @@ EVAL: function [
 PRINT: function [
 	str "the input string"
 ] [
-	pr_str str
+	pr_str/print_readably str
 ]
 
 rep: function [
