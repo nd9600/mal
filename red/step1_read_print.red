@@ -15,9 +15,7 @@ do %printer.red
 READ: function [
 	str [string!] "the input string"
 ] [
-	data: read_str str
-	probe data
-	data
+	read_str str
 ]
 
 EVAL: function [

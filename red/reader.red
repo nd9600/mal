@@ -75,9 +75,7 @@ tokenizer: function [
 	;flattened_tokens: copy []
 	;foreach token tokens [append flattened_tokens token]
 
-	tokens_as_strings: copy []
-	foreach token tokens [append tokens_as_strings to-string token]
-	tokens_as_strings
+	tokens_as_strings: f_map lambda [to-string ?] tokens
 ]
 
 read_form: function [
@@ -94,11 +92,11 @@ read_form: function [
 read_list: function [
 	current_reader [object!] "the current reader"
 ] [
-	print_backup rejoin ["list, token: " current_reader/peek]
+	;print_backup rejoin ["list, token: " current_reader/peek]
 	current_reader/next
 	list: make MalList []
 	until [
-		print_backup rejoin ["token: " current_reader/peek]
+		;print_backup rejoin ["token: " current_reader/peek]
 		list/_append read_form current_reader 
 		current_reader/next 
 		current_reader/peek == ")"
@@ -109,9 +107,7 @@ read_list: function [
 read_atom: function [
 	current_reader [object!] "the current reader"
 ] [
-
 	digit: charset "0123456789"
-
 	token: current_reader/peek
 	case [
 		(parse token [some digit]) [return make MalInteger [data: to-integer token]]

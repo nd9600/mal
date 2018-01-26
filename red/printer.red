@@ -16,6 +16,7 @@ separate: function [
 pr_str: function [
 	obj [object!] "the Mal data structure to print"
 ] [
+	print_backup rejoin ["#####^/obj: " obj "^/#####^/"]
 	case [
 		obj/is_type "MalSymbol" [return obj/data]
 		obj/is_type "MalInteger" [return to-string obj/data]
