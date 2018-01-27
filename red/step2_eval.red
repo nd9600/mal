@@ -32,16 +32,21 @@ brackets_match: function [
 	counter
 ]
 
+access: function [block i k] [select (do block/(i)) k]
+;put Mal objects in blocks for now
+
+
 eval_ast: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
-	print_backup rejoin ["#####^/ast2: " ast "^/#####^/"]
+	print_backup rejoin ["#####^/ast2: " mold ast "^/#####^/"]
+	print_backup (type? ast)
 	case [
 		logic? ast [ast]
 		integer? ast [ast]
 		string? ast [ast]
-		ast/is_type "MalList" [f_map lambda [EVAL ?] ast/data]
+		ast/is_type "MalList" [f_map lambda [EVAL ? env] ast/data]
 		ast/is_type "MalSymbol" [
 			either (not none? select env ast/data) [
 				select env ast/data
@@ -116,7 +121,7 @@ forever [
 	    		switch/default error/arg1 [
 	    			"blank line" []
 	    		] [
-    				print_backup rejoin ["error: " error/arg1]
+    				print_backup rejoin ["error: " error]
     			]
     		]
 		]
