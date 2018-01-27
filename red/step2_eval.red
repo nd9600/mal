@@ -36,16 +36,17 @@ eval_ast: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
+	print_backup rejoin ["#####^/ast2: " ast "^/#####^/"]
 	case [
 		logic? ast [ast]
 		integer? ast [ast]
 		string? ast [ast]
-		ast/is_type "MalList" [f_map lambda [EVAL ?] ast]
+		ast/is_type "MalList" [f_map lambda [EVAL ?] ast/data]
 		ast/is_type "MalSymbol" [
-			either (not none? select env obj/data) [
-				select env obj/data
+			either (not none? select env ast/data) [
+				select env ast/data
 			] [
-				do make error! rejoin [obj/data ": symbol not found"]
+				do make error! rejoin [ast/data ": symbol not found"]
 			]
 		]
 		true [ast]
@@ -62,18 +63,18 @@ EVAL: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
-	print_backup rejoin ["#####^/ast: " ast "^/#####^/"]
+	print_backup rejoin ["#####^/ast1: " ast "^/#####^/"]
 	case [
 		logic? ast [eval_ast ast env]
 		integer? ast [eval_ast ast env]
 		string? ast [eval_ast ast env]
-		not ast/is_type "MalList" ast [eval_ast ast env]
+		not ast/is_type "MalList" [eval_ast ast env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
 			print_backup rejoin ["#####^/unevaluated_list: " ast "^/#####^/"]
 			evaluated_list: eval_ast ast env
 			print_backup rejoin ["#####^/evaluated_list: " evaluated_list "^/#####^/"]
-			f: first evaluated_list/data
+			f: to-lit-word first evaluated_list/data
 			args: next evaluated_list/data
 			return apply f a
 		]
