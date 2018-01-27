@@ -18,6 +18,15 @@ repl_env/-: lambda [?x - ?y]
 repl_env/*: lambda [?x * ?y]
 repl_env/('/): lambda [?x / ?y]
 
+apply_repl_env: function [
+    "Calls a repl_env function on some arguments"
+    env [map!] "the REPL environment"
+    f [string!] "the function to apply"
+    args [block!]
+] [
+    apply select env (to-word f) args
+]
+
 brackets_match: function [
 	str [string!]
 	opening_char [char!]
@@ -79,9 +88,10 @@ EVAL: function [
 			print_backup rejoin ["#####^/unevaluated_list: " ast "^/#####^/"]
 			evaluated_list: eval_ast ast env
 			print_backup rejoin ["#####^/evaluated_list: " evaluated_list "^/#####^/"]
-			f: to-lit-word first evaluated_list/data
+			f: first evaluated_list/data
 			args: next evaluated_list/data
-			return apply f a
+			;return apply f args
+            return apply_repl_env f args
 		]
 	]	
 ]
@@ -116,7 +126,7 @@ forever [
 	    	if error? error: try [
 	    		result: rep characters repl_env
 				print_backup result
-				none ; 'print doesn't return anything, so this will (ironically) crash without this line
+				none ; 'print doesn't return anything, so the program will (ironically) crash without this line
 	    	] [
 	    		switch/default error/arg1 [
 	    			"blank line" []
