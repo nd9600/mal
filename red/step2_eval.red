@@ -50,7 +50,7 @@ eval_ast: function [
 			either (not none? select env (to-word ast/data)) [
 				return mold select env (to-word ast/data) ; if we don't mold it Red will try to execute it
 			] [
-				do make error! rejoin [ast/data ": symbol not found"]
+				do make error! rejoin ["'" ast/data "' not found"]
 			]
 		]
 		true [return ast]
@@ -91,10 +91,18 @@ rep: function [
 	str [string!] "the input string"
 	env [map!] "the REPL environment"
 ] [
-	PRINT EVAL (READ str) env
+	if error? error: try [
+		return PRINT EVAL (READ str) env
+	]  [
+		switch/default error/arg1 [
+			"blank line" [return ""] ; will print nothing if a blank line or a line with only a comment was entered
+		] [
+			return error/arg1
+		]
+	]
 ]
 
-;do %step2_tests.red
+do %step2_tests.red
 
 forever [
 	characters: to-string ask "user> "
@@ -108,18 +116,9 @@ forever [
 			either (num < 0) [print_backup "expected '['"] [print_backup "expected ']', got EOF"]
 		]
 	    true [
-	    	if error? error: try [
-	    		result: rep characters repl_env
-				print_backup result
-				if system/platform == 'Windows [do-events/no-wait] ; the GUI won't print anything out without this, see issue #2753
-				none ; 'print doesn't return anything, so the program will (ironically) crash without this line
-	    	] [
-	    		switch/default error/arg1 [
-	    			"blank line" []
-	    		] [
-    				print_backup rejoin ["error: " error]
-    			]
-    		]
-		]
+	    	result: rep characters repl_env
+    		if result <> "" [print_backup result]
+			if system/platform == 'Windows [do-events/no-wait] ; the GUI won't print anything out without this, see issue #2753
+    	]
 	]
 ]

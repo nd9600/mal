@@ -29,8 +29,8 @@ tokenizer: function [
 	thru_escaped_double_quote: [any [thru "\^""]]
 	between_double_quotes: ["^"" thru_escaped_double_quote thru "^""]
 
-	characters_except_newlines: charset reduce ['not newline cr lf "^0C"]
-	non_special_characters: charset reduce ['not newline cr lf "^0C" tab space "[]^{^}('^"`,;)"]
+	characters_except_newlines: charset reduce ['not newline cr lf "^(0C)"]
+	non_special_characters: charset reduce ['not newline cr lf "^(0C)" tab space "[]^{^}('^"`,;)"]
 
 	lexer_rules: [
 		collect any [ ; the regex seems to repeat until you get to the end of the string, so we have to put in an 'any here
