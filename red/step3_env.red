@@ -14,7 +14,7 @@ do %reader.red
 do %printer.red
 do %env.red
 
-repl_env: make Env []
+repl_env: make_env
 repl_env/set "+" lambda [?x + ?y]
 repl_env/set "-" lambda [?x - ?y]
 repl_env/set "*" lambda [?x * ?y]
@@ -49,10 +49,10 @@ eval_ast: function [
 		]
 		ast/is_type "MalSymbol" [
 			either (not none? this_env/get ast/data) [
-				d2: mold this_env/get ast/data
-				print_backup rejoin ["#####^/this_env/data: " this_env/data "^/#####^/"]
-				print_backup rejoin ["#####^/d2: " d2 "^/#####^/"]
-				return d2 ; if we don't mold it Red will try to execute it
+				value: mold this_env/get ast/data ; if we don't mold it Red will try to execute it
+				;print_backup rejoin ["#####^/this_env/data: " this_env/data "^/#####^/"]
+				;print_backup rejoin ["#####^/value: " value "^/#####^/"]
+				return value
 			] [
 				do make error! rejoin ["'" ast/data "' not found"]
 			]
