@@ -129,7 +129,7 @@ read_atom: function [
 
 	token: current_reader/peek
 	case [
-		(parse token [some digit]) [return to-integer token]
+		(parse token [opt "-" some digit]) [return to-integer token]
 		(parse token string) [return make_string token]
 		token == "nil" [return make MalNil []]
 		(parse token ["true" | "false"]) [return either (token == "true") [true][false] ]
