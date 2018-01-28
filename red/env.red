@@ -17,7 +17,7 @@ Env: make object! [
 	] [
 		case [
 			(not none? select self/data (to-word key)) [self/data]
-			((not self/outer/is_type "MalNil") and (not none? self/outer/find key)) [self/data]
+			all [(not self/outer/is_type "MalNil") (not none? self/outer/find key)] [self/data]
 			true [none]
 		]
 	]
@@ -25,7 +25,7 @@ Env: make object! [
 		key [string!]
 	] [
 		either (not none? self/find key) [
-			select self/data (to-word ast/data)
+			select self/data (to-word key)
 		] [
 			do make error! rejoin [key " not found"]
 		]
