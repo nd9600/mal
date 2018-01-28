@@ -3,6 +3,7 @@ Red [
 ]
 
 separate: function [
+	"Inserts a separator between each element in a list"
 	block [block!]
 	separator [string!]
 ] [

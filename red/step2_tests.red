@@ -4,49 +4,34 @@ Red [
 
 do %testing.red
 
-;; Testing read of numbers
-assert [ (rep "1" repl_env ) == "1" ]
-assert [ (rep "7" repl_env ) == "7" ]
-assert [ (rep "  7 " repl_env ) == "7" ]  
-assert [ (rep "-123" repl_env ) == "-123" ]
+;; Testing evaluation of arithmetic operations
+assert [ (rep "(+ 1 2)" repl_env ) == "3" ]
+assert [ (rep "(+ 5 (* 2 3))" repl_env ) == "11" ]
+assert [ (rep "(- (+ 5 (* 2 3)) 3)" repl_env ) == "8" ]
+assert [ (rep "(/ (- (+ 5 (* 2 3)) 3) 4)" repl_env ) == "2" ]
+assert [ (rep "(/ (- (+ 515 (* 87 311)) 302) 27)" repl_env ) == "1010" ]
+assert [ (rep "(* -3 6)" repl_env ) == "-18" ]
+assert [ (rep "(/ (- (+ 515 (* -87 311)) 296) 27)" repl_env ) == "-994" ]
+;assert [ (rep "(abc 1 2 3)" repl_env ) == "abc not found" ]
 
-
-;; Testing read of symbols
-assert [ (rep "+" repl_env ) == "+" ]
-assert [ (rep "abc" repl_env ) == "abc" ]
-assert [ (rep "   abc   " repl_env ) == "abc" ]
-assert [ (rep "abc5" repl_env ) == "abc5" ]
-assert [ (rep "abc-def" repl_env ) == "abc-def" ]
-
-
-;; Testing read of lists
-assert [ (rep "(+ 1 2)" repl_env ) == "(+ 1 2)" ]
+;; Testing empty list
 assert [ (rep "()" repl_env ) == "()" ]
-assert [ (rep "(nil)" repl_env ) == "(nil)" ]
-assert [ (rep "((3 4))" repl_env ) == "((3 4))" ]
-assert [ (rep "(+ 1 (+ 2 3))" repl_env ) == "(+ 1 (+ 2 3))" ]
-
-assert [ (rep "  ( +   1   (+   2 3   )   )  " repl_env ) == "(+ 1 (+ 2 3))" ]
-assert [ (rep "(* 1 2)" repl_env ) == "(* 1 2)" ]
-assert [ (rep "(** 1 2)" repl_env ) == "(** 1 2)" ]
-assert [ (rep "(* -3 6)" repl_env ) == "(* -3 6)" ]
-
-;; Test commas as whitespace
-assert [ (rep "(1 2, 3,,,,),," repl_env ) == "(1 2 3)" ]
 
 print_backup "all required tests passed"
 
-;; Testing read of nil/true/false
-assert [ (rep "nil" repl_env ) == "nil" ]
-assert [ (rep "true" repl_env ) == "true" ]
-assert [ (rep "false" repl_env ) == "false" ]
+;>>> deferrable=True
+;>>> optional=True
+;;
+;; -------- Deferrable/Optional Functionality --------
 
-;; Testing read of strings
-assert [ (rep "^"abc^"" repl_env ) == "^"abc^"" ]
-assert [ (rep "   ^"abc^"   " repl_env ) == "^"abc^"" ]
-assert [ (rep "^"abc (with parens)^"" repl_env ) == "^"abc (with parens)^"" ]
-assert [ (rep "^"abc\^"def^"" repl_env ) == "^"abc\^"def^"" ]
-assert [ (rep "^"abc\ndef^"" repl_env ) == "^"abc\ndef^"" ]
-assert [ (rep "^"^"" repl_env ) == "^"^"" ]
+;; Testing evaluation within collection literals
+;[1 2 (+ 1 2)]
+;=>[1 2 3]
 
-print_backup "all tests passed"
+;{"a" (+ 7 8)}
+;=>{"a" 15}
+
+;{:a (+ 7 8)}
+;=>{:a 15}
+
+;print_backup "all tests passed"
