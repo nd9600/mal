@@ -17,7 +17,7 @@ pr_str: function [
 	obj "the Mal data structure to print"
 	/print_readably "print out the string in a form that can be machine-read"
 ] [
-	;print_backup rejoin ["#####^/obj: " obj "^/#####^/"]
+	print_backup rejoin ["#####^/obj: " obj ", type: " type? obj  "^/#####^/"]
 	case [
 		logic? obj [return to-string obj]
 		integer? obj [return obj]
