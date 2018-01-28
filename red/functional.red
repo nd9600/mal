@@ -42,18 +42,8 @@ f_map: function [
     block [block!] "the block to map across"
 ] [
     result: copy/deep block
-    print_backup rejoin ["#####^/f_map, f: " source f "^/#####^/"]
-    print_backup rejoin ["block: " mold result]
-    print_backup rejoin ["length?: " length? result]
-    print_backup rejoin ["first?: " mold first result]
-    print_backup rejoin ["second?: " mold second result]
-    print_backup rejoin ["third?: " mold third result]
-
     while [not tail? result] [
-        fi: first result
-        print_backup rejoin ["fi?: " mold fi]
-        replacement: f fi
-        print_backup rejoin ["replacement?: " mold replacement]
+        replacement: f first result
         result: change/part result replacement 1
     ]
     head result

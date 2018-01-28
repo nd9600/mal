@@ -46,18 +46,12 @@ eval_ast: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
-	print_backup rejoin ["#####^/ast2: " mold ast "^/#####^/"]
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [return ast]
-		ast/is_type "MalList" [
-			print_backup rejoin ["#####^/ob: " mold ast/data]
-			print_backup rejoin ["env: " mold env]
-			return f_map lambda [EVAL ? env] ast/data
-		]
+		ast/is_type "MalList" [return f_map lambda [EVAL ? env] ast/data]
 		ast/is_type "MalSymbol" [
-			either (not none? select env to-word ast/data) [
-				print_backup rejoin ["value_of_symbol: " mold select env to-word ast/data]
-				return mold select env to-word ast/data
+			either (not none? select env (to-word ast/data)) [
+				return mold select env (to-word ast/data) ; if we don't mold it Red will try to execute it
 			] [
 				do make error! rejoin [ast/data ": symbol not found"]
 			]
@@ -76,15 +70,13 @@ EVAL: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
-	print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
+	;print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast env]
 		not ast/is_type "MalList" [eval_ast ast env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
-			print_backup rejoin ["#####^/unevaluated_list: " mold ast "^/#####^/"]
 			evaluated_list: eval_ast ast env
-			print_backup rejoin ["#####^/evaluated_list: " mold evaluated_list "^/#####^/"]
 			f: do first evaluated_list ;it's fine if this fails when you try to eval a list with no function, like (1)
 			args: next evaluated_list
 			return apply :f args
