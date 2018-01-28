@@ -1,5 +1,6 @@
 Red [
     Title: "Red implementation of step 2 of the Mal Lisp"
+    Docs: https://github.com/kanaka/mal/blob/master/process/guide.md#step-2-eval
 ]
 
 system/options/quiet: true
@@ -41,29 +42,27 @@ brackets_match: function [
 	counter
 ]
 
-access: function [block i k] [select (do block/(i)) k]
-;put Mal objects in blocks for now
-
-
 eval_ast: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
 	print_backup rejoin ["#####^/ast2: " mold ast "^/#####^/"]
-	print_backup (type? ast)
 	case [
-		logic? ast [ast]
-		integer? ast [ast]
-		string? ast [ast]
-		ast/is_type "MalList" [f_map lambda [EVAL ? env] ast/data]
+		(logic? ast) or (integer? ast) or (string? ast) [return ast]
+		ast/is_type "MalList" [
+			print_backup rejoin ["#####^/ob: " mold ast/data]
+			print_backup rejoin ["env: " mold env]
+			return f_map lambda [EVAL ? env] ast/data
+		]
 		ast/is_type "MalSymbol" [
-			either (not none? select env ast/data) [
-				select env ast/data
+			either (not none? select env to-word ast/data) [
+				print_backup rejoin ["value_of_symbol: " mold select env to-word ast/data]
+				return mold select env to-word ast/data
 			] [
 				do make error! rejoin [ast/data ": symbol not found"]
 			]
 		]
-		true [ast]
+		true [return ast]
 	]
 ]
 
@@ -77,21 +76,18 @@ EVAL: function [
 	ast "the Mal AST"
 	env [map!] "the REPL environment"
 ] [
-	print_backup rejoin ["#####^/ast1: " ast "^/#####^/"]
+	print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
 	case [
-		logic? ast [eval_ast ast env]
-		integer? ast [eval_ast ast env]
-		string? ast [eval_ast ast env]
+		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast env]
 		not ast/is_type "MalList" [eval_ast ast env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
-			print_backup rejoin ["#####^/unevaluated_list: " ast "^/#####^/"]
+			print_backup rejoin ["#####^/unevaluated_list: " mold ast "^/#####^/"]
 			evaluated_list: eval_ast ast env
-			print_backup rejoin ["#####^/evaluated_list: " evaluated_list "^/#####^/"]
-			f: first evaluated_list/data
-			args: next evaluated_list/data
-			;return apply f args
-            return apply_repl_env f args
+			print_backup rejoin ["#####^/evaluated_list: " mold evaluated_list "^/#####^/"]
+			f: do first evaluated_list ;it's fine if this fails when you try to eval a list with no function, like (1)
+			args: next evaluated_list
+			return apply :f args
 		]
 	]	
 ]
@@ -126,6 +122,7 @@ forever [
 	    	if error? error: try [
 	    		result: rep characters repl_env
 				print_backup result
+				if system/platform == 'Windows [do-events/no-wait] ; the GUI won't print anything out without this, see issue #2753
 				none ; 'print doesn't return anything, so the program will (ironically) crash without this line
 	    	] [
 	    		switch/default error/arg1 [

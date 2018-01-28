@@ -99,8 +99,8 @@ read_sequence: function [
 ] [
 	current_reader/next
 	while [current_reader/peek <> final_token] [
-		ob: read_form current_reader
-		sequence/_append reduce ob 
+		ob: reduce read_form current_reader
+		sequence/_append ob
 		current_reader/next 
 	]
 	sequence
