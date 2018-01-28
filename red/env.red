@@ -12,6 +12,7 @@ make_env: does [
 			value "the Mal value to add"
 		] [
 			self/data/(to-word key): :value
+			return :value
 		]
 		find: function [
 			key [string!]

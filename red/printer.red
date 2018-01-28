@@ -20,7 +20,7 @@ pr_str: function [
 	;print_backup rejoin ["#####^/obj: " obj "^/#####^/"]
 	case [
 		logic? obj [return to-string obj]
-		integer? obj [return to-string obj]
+		integer? obj [return obj]
 		string? obj [
 			either print_readably [
 				part_to_replace: copy/part next obj ((length? obj) - 2)

@@ -20,18 +20,10 @@ repl_env/set "-" lambda [?x - ?y]
 repl_env/set "*" lambda [?x * ?y]
 repl_env/set "/" lambda [?x / ?y]
 
-brackets_match: function [
-	str [string!]
-	opening_char [char!]
-	ending_char [char!]
+READ: function [
+	str [string!] "the input string"
 ] [
-	brackets: copy rejoin parse str [collect [any [keep opening_char | keep ending_char | skip] ]]
-	counter: 0
-	foreach bracket brackets [
-		if counter < 0 [return false]
-		either bracket == opening_char [counter: counter + 1] [counter: counter - 1]
-	]
-	counter
+	read_str str
 ]
 
 eval_ast: function [
@@ -61,12 +53,6 @@ eval_ast: function [
 	]
 ]
 
-READ: function [
-	str [string!] "the input string"
-] [
-	read_str str
-]
-
 EVAL: function [
 	ast "the Mal AST"
 	this_env [object!] "the REPL environment"
@@ -77,10 +63,26 @@ EVAL: function [
 		not ast/is_type "MalList" [eval_ast ast this_env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
-			evaluated_list: eval_ast ast this_env
-			f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
-			args: next evaluated_list/data
-			return apply :f args
+			probe ast/data
+			first_element: (ast/_get 1)
+			probe first_element/data
+			case [
+				first_element/data == "def!" [
+					mal_symbol: ast/_get 2
+					key: mal_symbol/data
+					value: eval_ast (ast/_get 3) this_env
+					this_env/set key value
+					print_backup rejoin ["#####^/this_env/data: " mold this_env/data "^/#####^/"]
+					return value
+				]
+				first_element/data == "let*" []
+				true [
+					evaluated_list: eval_ast ast this_env
+					f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
+					args: next evaluated_list/data
+					return apply :f args
+				]
+			]
 		]
 	]	
 ]
@@ -89,6 +91,20 @@ PRINT: function [
 	structure "the structure to print"
 ] [
 	pr_str/print_readably structure
+]
+
+brackets_match: function [
+	str [string!]
+	opening_char [char!]
+	ending_char [char!]
+] [
+	brackets: copy rejoin parse str [collect [any [keep opening_char | keep ending_char | skip] ]]
+	counter: 0
+	foreach bracket brackets [
+		if counter < 0 [return false]
+		either bracket == opening_char [counter: counter + 1] [counter: counter - 1]
+	]
+	counter
 ]
 
 rep: function [
