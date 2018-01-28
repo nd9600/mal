@@ -19,15 +19,6 @@ repl_env/-: lambda [?x - ?y]
 repl_env/*: lambda [?x * ?y]
 repl_env/('/): lambda [?x / ?y]
 
-apply_repl_env: function [
-    "Calls a repl_env function on some arguments"
-    env [map!] "the REPL environment"
-    f [string!] "the function to apply"
-    args [block!]
-] [
-    apply select env (to-word f) args
-]
-
 brackets_match: function [
 	str [string!]
 	opening_char [char!]
@@ -48,7 +39,13 @@ eval_ast: function [
 ] [
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [return ast]
-		ast/is_type "MalList" [return f_map lambda [EVAL ? env] ast/data]
+		ast/is_type "MalSequence" [
+			data_evaluated: f_map lambda [EVAL ? env] ast/data
+			case [
+				ast/is_type "MalList" [return make MalList [data: data_evaluated]]
+				ast/is_type "MalVector" [return make MalVector [data: data_evaluated]]
+			]
+		]
 		ast/is_type "MalSymbol" [
 			either (not none? select env (to-word ast/data)) [
 				return mold select env (to-word ast/data) ; if we don't mold it Red will try to execute it
@@ -77,8 +74,8 @@ EVAL: function [
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
 			evaluated_list: eval_ast ast env
-			f: do first evaluated_list ;it's fine if this fails when you try to eval a list with no function, like (1)
-			args: next evaluated_list
+			f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
+			args: next evaluated_list/data
 			return apply :f args
 		]
 	]	
