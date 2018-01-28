@@ -49,9 +49,10 @@ eval_ast: function [
 		]
 		ast/is_type "MalSymbol" [
 			either (not none? this_env/get ast/data) [
-				d: mold select this_env/get ast/data
-				print_backup rejoin ["#####^/d: " d "^/#####^/"]
-				return d ; if we don't mold it Red will try to execute it
+				d2: mold this_env/get ast/data
+				print_backup rejoin ["#####^/this_env/data: " this_env/data "^/#####^/"]
+				print_backup rejoin ["#####^/d2: " d2 "^/#####^/"]
+				return d2 ; if we don't mold it Red will try to execute it
 			] [
 				do make error! rejoin ["'" ast/data "' not found"]
 			]
@@ -85,9 +86,9 @@ EVAL: function [
 ]
 
 PRINT: function [
-	str "the input string"
+	structure "the structure to print"
 ] [
-	pr_str/print_readably str
+	pr_str/print_readably structure
 ]
 
 rep: function [
@@ -105,7 +106,7 @@ rep: function [
 	]
 ]
 
-do %step3_tests.red
+;do %step3_tests.red
 
 forever [
 	characters: to-string ask "user> "

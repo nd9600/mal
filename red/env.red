@@ -16,16 +16,19 @@ Env: make object! [
 		key [string!]
 	] [
 		case [
-			(not none? select self/data (to-word key)) [self/data]
-			all [(not self/outer/is_type "MalNil") (not none? self/outer/find key)] [self/data]
+			(not none? select self/data (to-word key)) [self]
+			all [(not self/outer/is_type "MalNil") (not none? self/outer/find key)] [self/outer]
 			true [none]
 		]
 	]
 	get: function [
 		key [string!]
 	] [
-		either (not none? self/find key) [
-			select self/data (to-word key)
+		either (not none? e: self/find key) [
+			return select e/data (to-word key)
+			print_backup rejoin ["#####^/da: " daaaaaa "^/#####^/"]
+			print_backup rejoin ["#####^/d: " select e/data (to-word key) "^/#####^/"]
+			d
 		] [
 			do make error! rejoin [key " not found"]
 		]
