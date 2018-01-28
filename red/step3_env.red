@@ -14,11 +14,11 @@ do %reader.red
 do %printer.red
 do %env.red
 
-repl_env: make map! []
-repl_env/+: lambda [?x + ?y]
-repl_env/-: lambda [?x - ?y]
-repl_env/*: lambda [?x * ?y]
-repl_env/('/): lambda [?x / ?y]
+repl_env: make Env []
+repl_env/set "+" lambda [?x + ?y]
+repl_env/set "-" lambda [?x - ?y]
+repl_env/set "*" lambda [?x * ?y]
+repl_env/set "/" lambda [?x / ?y]
 
 brackets_match: function [
 	str [string!]
@@ -36,7 +36,7 @@ brackets_match: function [
 
 eval_ast: function [
 	ast "the Mal AST"
-	this_env [map!] "the REPL environment"
+	this_env [object!] "the REPL environment"
 ] [
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [return ast]
@@ -48,8 +48,10 @@ eval_ast: function [
 			]
 		]
 		ast/is_type "MalSymbol" [
-			either (not none? select this_env (to-word ast/data)) [
-				return mold select this_env (to-word ast/data) ; if we don't mold it Red will try to execute it
+			either (not none? this_env/get ast/data) [
+				d: mold select this_env/get ast/data
+				print_backup rejoin ["#####^/d: " d "^/#####^/"]
+				return d ; if we don't mold it Red will try to execute it
 			] [
 				do make error! rejoin ["'" ast/data "' not found"]
 			]
@@ -66,7 +68,7 @@ READ: function [
 
 EVAL: function [
 	ast "the Mal AST"
-	this_env [map!] "the REPL environment"
+	this_env [object!] "the REPL environment"
 ] [
 	;print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
 	case [
@@ -90,7 +92,7 @@ PRINT: function [
 
 rep: function [
 	str [string!] "the input string"
-	this_env [map!] "the REPL environment"
+	this_env [object!] "the REPL environment"
 ] [
 	if error? error: try [
 		return PRINT EVAL (READ str) this_env
@@ -103,7 +105,7 @@ rep: function [
 	]
 ]
 
-;do %step3_tests.red
+do %step3_tests.red
 
 forever [
 	characters: to-string ask "user> "

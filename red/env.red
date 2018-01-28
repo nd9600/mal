@@ -10,7 +10,7 @@ Env: make object! [
 		key [string!]
 		value "the Mal value to add"
 	] [
-		self/data/(to-word key): value
+		self/data/(to-word key): :value
 	]
 	find: function [
 		key [string!]
