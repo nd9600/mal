@@ -70,6 +70,9 @@ EVAL: function [
 				]
 				first_element/data == "let*" [
 					new_env: make_env [outer: this_env]
+					new_bindings: ast/_get 2
+					;Take the second element of the binding list, call EVAL using the new "let*" environment as the evaluation environment, then call set on the "let*" environment using the first binding list element as the key and the evaluated second element as the value. This is repeated for each odd/even pair in the binding list. Note in particular, the bindings earlier in the list can be referred to by later bindings. 
+					EVAL (ast/_get 3) new_env
 				]
 				true [
 					evaluated_list: eval_ast ast this_env
