@@ -40,16 +40,13 @@ eval_ast: function [
 			]
 		]
 		ast/is_type "MalSymbol" [
-			either (not none? this_env/get ast/data) [
-				print_backup rejoin ["#####^/this_env/data: " this_env/data "^/#####^/"]
-				value: this_env/get ast/data ; if we don't mold it Red will try to execute it
-				print_backup rejoin ["#####^/value: " mold :value "^/#####^/"]
-				either function? :value [mold :value][value]
+			either (not none? value: this_env/get ast/data) [
+				either function? :value [mold :value][value] ; if we don't mold it Red will try to execute it
 			] [
 				do make error! rejoin ["'" ast/data "' not found"]
 			]
 		]
-		true [return ast]
+		true [ast]
 	]
 ]
 
@@ -61,20 +58,13 @@ EVAL: function [
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast this_env]
 		ast/is_type "MalSymbol" [
-			print_backup "in EVAL symbol"
 			a: eval_ast ast this_env 
-			print_backup "in EVAL symbol2"
-			print_backup rejoin ["#####^/symbol data: " mold :a "^/#####^/"] 
-			print_backup "in EVAL symbol3"
-			print_backup type? :a
 			return :a
 		]
 		not ast/is_type "MalList" [eval_ast ast this_env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
-			probe ast/data
 			first_element: (ast/_get 1)
-			probe first_element/data
 			case [
 				first_element/data == "def!" [
 					mal_symbol: ast/_get 2
@@ -85,7 +75,6 @@ EVAL: function [
 				first_element/data == "let*" []
 				true [
 					evaluated_list: eval_ast ast this_env
-					print_backup rejoin ["#####^/evaluated_list: " mold :evaluated_list "^/#####^/"]
 					f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
 					args: next evaluated_list/data
 					return apply :f args

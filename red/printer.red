@@ -14,32 +14,32 @@ separate: function [
 ]
 
 pr_str: function [
-	obj "the Mal data structure to print"
+	structure "the Mal data structure to print"
 	/print_readably "print out the string in a form that can be machine-read"
 ] [
-	print_backup rejoin ["#####^/obj: " obj ", type: " type? obj  "^/#####^/"]
+	;print_backup rejoin ["#####^/structure: " structure ", type: " type? structure  "^/#####^/"]
 	case [
-		logic? obj [return to-string obj]
-		integer? obj [return obj]
-		string? obj [
+		logic? structure [to-string structure]
+		integer? structure [structure]
+		string? structure [
 			either print_readably [
-				part_to_replace: copy/part next obj ((length? obj) - 2)
+				part_to_replace: copy/part next structure ((length? structure) - 2)
 				backslashes_replaced: replace/all part_to_replace "\" "\\" ; we must replace the backslashes first as it would add in extra ones otherwise
 				double_quotes_replaced: replace/all backslashes_replaced "^"" "\^""
 				newlines_replaced: replace/all double_quotes_replaced newline "\n"
-				return rejoin ["^"" newlines_replaced "^""]
+				rejoin ["^"" newlines_replaced "^""]
 			] [
-				return obj
+				structure
 			]
 		]
-		obj/is_type "MalSequence" [
-			middle: rejoin separate (f_map lambda [pr_str ?] obj/data) " "
+		structure/is_type "MalSequence" [
+			middle: rejoin separate (f_map lambda [pr_str ?] structure/data) " "
 			case [
-				obj/is_type "MalList" [return rejoin ["(" middle ")"]]
-				obj/is_type "MalVector" [return rejoin ["[" middle "]"]]
+				structure/is_type "MalList" [rejoin ["(" middle ")"]]
+				structure/is_type "MalVector" [rejoin ["[" middle "]"]]
 			]
 		]
-		obj/is_type "MalNil" [return "nil"]
-		obj/is_type "MalSymbol" [return obj/data]
+		structure/is_type "MalNil" ["nil"]
+		structure/is_type "MalSymbol" [structure/data]
 	]
 ]

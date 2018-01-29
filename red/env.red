@@ -19,7 +19,7 @@ make_env: does [
 		] [
 			case [
 				(not none? select self/data (to-word key)) [self]
-				all [(not self/outer/is_type "MalNil") (not none? self/outer/find key)] [self/outer]
+				(not self/outer/is_type "MalNil") [self/outer/find key]
 				true [none]
 			]
 		]
