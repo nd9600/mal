@@ -57,10 +57,6 @@ EVAL: function [
 	print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast this_env]
-		ast/is_type "MalSymbol" [
-			a: eval_ast ast this_env 
-			return :a
-		]
 		not ast/is_type "MalList" [eval_ast ast this_env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
@@ -72,12 +68,14 @@ EVAL: function [
 					value: eval_ast (ast/_get 3) this_env
 					this_env/set key value
 				]
-				first_element/data == "let*" []
+				first_element/data == "let*" [
+					new_env: make_env [outer: this_env]
+				]
 				true [
 					evaluated_list: eval_ast ast this_env
 					f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
 					args: next evaluated_list/data
-					return apply :f args
+					apply :f args
 				]
 			]
 		]

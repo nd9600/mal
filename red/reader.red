@@ -85,10 +85,10 @@ read_form: function [
 
 	first_token: current_reader/peek
 	switch/default first_token [
-		"(" [return read_list current_reader]
-		"[" [return read_vector current_reader]
+		"(" [read_list current_reader]
+		"[" [read_vector current_reader]
 	] [
-		return read_atom current_reader
+		read_atom current_reader
 	]
 ]
 
@@ -99,8 +99,7 @@ read_sequence: function [
 ] [
 	current_reader/next
 	while [current_reader/peek <> final_token] [
-		ob: reduce read_form current_reader
-		sequence/_append ob
+		sequence/_append read_form current_reader
 		current_reader/next 
 	]
 	sequence
