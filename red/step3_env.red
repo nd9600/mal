@@ -29,7 +29,6 @@ READ: function [
 eval_ast: function [
 	ast "the Mal AST"
 	this_env [object!] "the REPL environment"
-	/mold_output
 ] [
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [ast]
@@ -43,13 +42,9 @@ eval_ast: function [
 		ast/is_type "MalSymbol" [
 			either (not none? this_env/get ast/data) [
 				print_backup rejoin ["#####^/this_env/data: " this_env/data "^/#####^/"]
-				probe mold_output
-				;print_backup rejoin ["#####^/value: " value "^/#####^/"]
-				either mold_output [
-					mold this_env/get ast/data ; if we don't mold it Red will try to execute it
-				] [
-					this_env/get ast/data
-				]
+				value: this_env/get ast/data ; if we don't mold it Red will try to execute it
+				print_backup rejoin ["#####^/value: " mold :value "^/#####^/"]
+				either function? :value [mold :value][value]
 			] [
 				do make error! rejoin ["'" ast/data "' not found"]
 			]
@@ -62,9 +57,18 @@ EVAL: function [
 	ast "the Mal AST"
 	this_env [object!] "the REPL environment"
 ] [
-	;print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
+	print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast this_env]
+		ast/is_type "MalSymbol" [
+			print_backup "in EVAL symbol"
+			a: eval_ast ast this_env 
+			print_backup "in EVAL symbol2"
+			print_backup rejoin ["#####^/symbol data: " mold :a "^/#####^/"] 
+			print_backup "in EVAL symbol3"
+			print_backup type? :a
+			return :a
+		]
 		not ast/is_type "MalList" [eval_ast ast this_env]
 		empty? ast/data [ast]
 		true [ ;the AST will be a non-empty list here
@@ -80,7 +84,8 @@ EVAL: function [
 				]
 				first_element/data == "let*" []
 				true [
-					evaluated_list: eval_ast/mold_output ast this_env
+					evaluated_list: eval_ast ast this_env
+					print_backup rejoin ["#####^/evaluated_list: " mold :evaluated_list "^/#####^/"]
 					f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
 					args: next evaluated_list/data
 					return apply :f args
