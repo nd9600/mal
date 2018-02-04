@@ -132,7 +132,7 @@ rep: function [
 	]
 ]
 
-;do %step3_tests.red
+do %step3_tests.red
 
 forever [
 	characters: to-string ask "user> "
