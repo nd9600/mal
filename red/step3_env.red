@@ -65,7 +65,7 @@ EVAL: function [
 				first_element/data == "def!" [
 					mal_symbol: ast/_get 2
 					key: mal_symbol/data
-					value: eval_ast (ast/_get 3) this_env
+					value: EVAL (ast/_get 3) this_env
 					this_env/set key value
 				]
 				first_element/data == "let*" [
