@@ -54,7 +54,7 @@ EVAL: function [
 	ast "the Mal AST"
 	this_env [object!] "the REPL environment"
 ] [
-	print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
+	;print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast this_env]
 		not ast/is_type "MalList" [eval_ast ast this_env]
@@ -83,7 +83,6 @@ EVAL: function [
 						new_env/set binding_key evaluated_binding_value
 						tail? new_bindings: next next new_bindings
 					]
-					print_backup rejoin ["new_env/data: " mold new_env/data]
 					EVAL (ast/_get 3) new_env
 				]
 				true [
