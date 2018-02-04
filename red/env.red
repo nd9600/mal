@@ -30,11 +30,8 @@ make_env: function [
 			get: function [
 				key [string!]
 			] [
-				either (not none? e: self/find key) [
-					select e/data (make_key key)
-				] [
-					do make error! rejoin [key " not found"]
-				]
+				if (not none? e: self/find key) [return select e/data (make_key key)]
+				do make error! rejoin [key " not found"]
 			]
 		]
 	]

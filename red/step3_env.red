@@ -69,9 +69,21 @@ EVAL: function [
 					this_env/set key value
 				]
 				first_element/data == "let*" [
-					new_env: make_env [outer: this_env]
-					new_bindings: ast/_get 2
-					;Take the second element of the binding list, call EVAL using the new "let*" environment as the evaluation environment, then call set on the "let*" environment using the first binding list element as the key and the evaluated second element as the value. This is repeated for each odd/even pair in the binding list. Note in particular, the bindings earlier in the list can be referred to by later bindings. 
+					new_env: make_env/set_outer this_env
+					new_bindings_list: ast/_get 2
+					new_bindings: new_bindings_list/data
+
+					if not ((length? new_bindings) % 2) == 0 [do make error! "wrong number of bindings"]
+
+					until [
+						binding_key_symbol: first new_bindings
+						binding_key: binding_key_symbol/data
+						evaluated_binding_value: EVAL (first next new_bindings) new_env
+
+						new_env/set binding_key evaluated_binding_value
+						tail? new_bindings: next next new_bindings
+					]
+					print_backup rejoin ["new_env/data: " mold new_env/data]
 					EVAL (ast/_get 3) new_env
 				]
 				true [
