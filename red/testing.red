@@ -15,7 +15,7 @@ assert: function [
                 "conditions: [" compose/only conditions "]"
             ] 
             print_backup e 
-            do make error! e 
+            do make error! rejoin ["assertion failed for: " mold conditions]
         ]
     ]
 ]
