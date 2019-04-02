@@ -70,17 +70,16 @@ EVAL: function [
 	env [map!] "the REPL environment"
 ] [
 	;print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
-    ?? ast
-    ?? env
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast env]
 		not ast/is_type "MalList" [eval_ast ast env]
 		empty? ast/data [ast]
-		true [ ;the AST will be a non-empty list here
+		true [ ; the AST will be a non-empty list here
 			evaluated_list: eval_ast ast env
-			f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
+			f: do first evaluated_list/data ; it's fine if this fails when you try to eval a list with no function, like (1)
 			args: next evaluated_list/data
-			return apply :f args
+
+			return h/apply :f args
 		]
 	]	
 ]
@@ -98,13 +97,15 @@ rep: function [
 	if error? error: try [
         ast: READ str
         evaluatedAST: EVAL ast env
-        ?? evaluatedAST
 		return PRINT evaluatedAST
 	]  [
 		switch/default error/arg1 [
 			"blank line" [return ""] ; will print nothing if a blank line or a line with only a comment was entered
 		] [
-			return h/errorToString error
+            if (error/type == 'user) [
+			    return error/arg1
+            ]
+            return h/errorToString error
 		]
 	]
 ]

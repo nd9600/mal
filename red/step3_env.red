@@ -10,7 +10,6 @@ print_backup: :print
 
 do %moduleLoader.red
 h: import/only %helpers.red [apply lambda f_map errorToString]
-?? h
 
 do %types.red
 do %reader.red
@@ -102,7 +101,7 @@ EVAL: function [
 PRINT: function [
 	structure "the structure to print"
 ] [
-	pr_str/print_readably structure
+	pr_str/print_readably/exactly structure
 ]
 
 brackets_match: function [
@@ -124,23 +123,20 @@ rep: function [
 	thisEnv [object!] "the REPL environment"
 ] [
 	if error? error: try [
-        ?? str
         ast: READ str
-        ?? ast
 		return PRINT EVAL ast thisEnv
 	]  [
-        ?? error
 		switch/default error/arg1 [
 			"blank line" [return ""] ; will print nothing if a blank line or a line with only a comment was entered
 		] [
-			return h/errorToString error
+			if (error/type == 'user) [
+			    return error/arg1
+            ]
+            return h/errorToString error
 		]
 	]
 ]
 
-probe rep "(+ 1 2)" repl_env
-
-comment [
 do %step3_tests.red
 
 forever [
@@ -160,5 +156,4 @@ forever [
 			if system/platform == 'Windows [do-events/no-wait] ; the GUI won't print anything out without this, see issue #2753
     	]
 	]
-]
 ]

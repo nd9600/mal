@@ -16,12 +16,12 @@ separate: function [
 pr_str: function [
 	structure "the Mal data structure to print"
 	/print_readably "print out the string in a form that can be machine-read"
+    /exactly "return integers as integers"
 ] [
 	;print_backup rejoin ["#####^/structure: " structure ", type: " type? structure  "^/#####^/"]
-    ?? structure
 	case [
 		logic? structure [to-string structure]
-		integer? structure [to-string structure]
+		integer? structure [either exactly [structure] [to-string structure]]
 		string? structure [
 			either print_readably [
 				part_to_replace: copy/part next structure ((length? structure) - 2)
@@ -34,7 +34,7 @@ pr_str: function [
 			]
 		]
 		structure/is_type "MalSequence" [
-			middle: rejoin separate (h/f_map h/lambda [pr_str ?] structure/data) " "
+			middle: rejoin separate (h/f_map h/lambda [either exactly [pr_str ?] [pr_str/exactly ?] ] structure/data) " "
 			case [
 				structure/is_type "MalList" [rejoin ["(" middle ")"]]
 				structure/is_type "MalVector" [rejoin ["[" middle "]"]]

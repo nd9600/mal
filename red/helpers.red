@@ -15,6 +15,23 @@ contains?: function [
     not none? find s e
 ]
 
+flatten: function [
+    "flattens a block"
+    b [block!]
+] [
+    flattened: copy []
+    while [not tail? b] [
+        element: first b
+        either block? element [
+            append flattened flatten element
+        ] [
+            append flattened element
+        ]
+        b: next b
+    ]
+    flattened
+]
+
 encap: function [
     "execute a block as a function! without polluting the global scope" 
     b [block!]
@@ -46,9 +63,10 @@ lambda: function [
     /applyArgs "immediately apply the lambda function to arguments"
         args [any-type!] "the arguments to apply the function to, can be a block!"
 ] [
+    flattenedBlock: flatten block
     spec: make block! 0
 
-    parse block [
+    parse flattenedBlock [
         any [
             set word word! (
                 if (strict-equal? first to-string word #"?") [
@@ -172,5 +190,5 @@ errorToString: function [
 ]
 
 export [
-    apply contains? encap |> lambda f_map f_filter f_fold assert objectToString errorToString
+    apply contains? flatten encap |> lambda f_map f_filter f_fold assert objectToString errorToString
 ]
