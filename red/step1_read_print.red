@@ -7,8 +7,10 @@ system/options/quiet: true
 read_backup: :read
 print_backup: :print
 
+do %moduleLoader.red
+h: import/only %helpers.red [apply lambda f_map]
+
 do %types.red
-do %functional.red
 do %reader.red
 do %printer.red
 
@@ -47,7 +49,9 @@ PRINT: function [
 rep: function [
 	str [string!] "the input string"
 ] [
-	PRINT EVAL READ str
+    ast: READ str
+    ?? ast
+	PRINT EVAL ast
 ]
 
 do %step1_tests.red

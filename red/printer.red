@@ -33,7 +33,7 @@ pr_str: function [
 			]
 		]
 		structure/is_type "MalSequence" [
-			middle: rejoin separate (f_map lambda [pr_str ?] structure/data) " "
+			middle: rejoin separate (h/f_map h/lambda [pr_str ?] structure/data) " "
 			case [
 				structure/is_type "MalList" [rejoin ["(" middle ")"]]
 				structure/is_type "MalVector" [rejoin ["[" middle "]"]]

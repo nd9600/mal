@@ -8,16 +8,19 @@ system/options/quiet: true
 read_backup: :read
 print_backup: :print
 
+do %moduleLoader.red
+h: import/only %helpers.red [apply lambda f_map errorToString]
+
 do %types.red
 do %functional.red
 do %reader.red
 do %printer.red
 
 repl_env: make map! []
-repl_env/+: lambda [?x + ?y]
-repl_env/-: lambda [?x - ?y]
-repl_env/*: lambda [?x * ?y]
-repl_env/('/): lambda [?x / ?y]
+repl_env/+: h/lambda [?x + ?y]
+repl_env/-: h/lambda [?x - ?y]
+repl_env/*: h/lambda [?x * ?y]
+repl_env/('/): h/lambda [?x / ?y]
 
 brackets_match: function [
 	str [string!]
@@ -40,7 +43,7 @@ eval_ast: function [
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [return ast]
 		ast/is_type "MalSequence" [
-			data_evaluated: f_map lambda [EVAL ? env] ast/data
+			data_evaluated: h/f_map h/lambda [EVAL ? env] ast/data
 			case [
 				ast/is_type "MalList" [return make MalList [data: data_evaluated]]
 				ast/is_type "MalVector" [return make MalVector [data: data_evaluated]]
@@ -97,7 +100,7 @@ rep: function [
 		switch/default error/arg1 [
 			"blank line" [return ""] ; will print nothing if a blank line or a line with only a comment was entered
 		] [
-			return error/arg1
+			return h/errorToString error
 		]
 	]
 ]

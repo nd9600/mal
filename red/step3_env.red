@@ -8,17 +8,20 @@ system/options/quiet: true
 read_backup: :read
 print_backup: :print
 
+do %moduleLoader.red
+h: import/only %helpers.red [apply lambda f_map errorToString]
+?? h
+
 do %types.red
-do %functional.red
 do %reader.red
 do %printer.red
 do %env.red
 
 repl_env: make_env
-repl_env/set "+" lambda [?x + ?y]
-repl_env/set "-" lambda [?x - ?y]
-repl_env/set "*" lambda [?x * ?y]
-repl_env/set "/" lambda [?x / ?y]
+repl_env/set "+" h/lambda [?x + ?y]
+repl_env/set "-" h/lambda [?x - ?y]
+repl_env/set "*" h/lambda [?x * ?y]
+repl_env/set "/" h/lambda [?x / ?y]
 
 READ: function [
 	str [string!] "the input string"
@@ -33,7 +36,7 @@ eval_ast: function [
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [ast]
 		ast/is_type "MalSequence" [
-			data_evaluated: f_map lambda [EVAL ? this_env] ast/data
+			data_evaluated: h/f_map h/lambda [EVAL ? this_env] ast/data
 			case [
 				ast/is_type "MalList" [make MalList [data: data_evaluated]]
 				ast/is_type "MalVector" [make MalVector [data: data_evaluated]]
@@ -89,7 +92,7 @@ EVAL: function [
 					evaluated_list: eval_ast ast this_env
 					f: do first evaluated_list/data ;it's fine if this fails when you try to eval a list with no function, like (1)
 					args: next evaluated_list/data
-					apply :f args
+					h/apply :f args
 				]
 			]
 		]
@@ -118,19 +121,26 @@ brackets_match: function [
 
 rep: function [
 	str [string!] "the input string"
-	this_env [object!] "the REPL environment"
+	thisEnv [object!] "the REPL environment"
 ] [
 	if error? error: try [
-		return PRINT EVAL (READ str) this_env
+        ?? str
+        ast: READ str
+        ?? ast
+		return PRINT EVAL ast thisEnv
 	]  [
+        ?? error
 		switch/default error/arg1 [
 			"blank line" [return ""] ; will print nothing if a blank line or a line with only a comment was entered
 		] [
-			return error/arg1
+			return h/errorToString error
 		]
 	]
 ]
 
+probe rep "(+ 1 2)" repl_env
+
+comment [
 do %step3_tests.red
 
 forever [
@@ -150,4 +160,5 @@ forever [
 			if system/platform == 'Windows [do-events/no-wait] ; the GUI won't print anything out without this, see issue #2753
     	]
 	]
+]
 ]

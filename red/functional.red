@@ -10,6 +10,8 @@ apply: function [f args][do compose [f (args)] ]
 lambda: function [
         "makes lambda functions - https://gist.github.com/draegtun/11b0258377a3b49bfd9dc91c3a1c8c3d"
         block [block!] "the function to make"
+         /applyArgs "immediately apply the lambda function to arguments"
+            args [any-type!] "the arguments to apply the function to, can be a block!"
     ] [
     spec: make block! 0
 
@@ -33,7 +35,14 @@ lambda: function [
         do make error! {cannot match ? with ?name placeholders}
     ]
 
-    function spec block
+    f: function spec block
+    
+    either applyArgs [
+        argsAsBlock: either block? args [args] [reduce [args]]
+        apply :f argsAsBlock
+    ] [
+        :f
+    ]
 ]
 
 f_map: function [

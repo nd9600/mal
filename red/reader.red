@@ -54,7 +54,7 @@ tokenizer: function [
 	;flattened_tokens: copy []
 	;foreach token tokens [append flattened_tokens token]
 
-	tokens_as_strings: f_map lambda [to-string ?] tokens
+	tokens_as_strings: h/f_map h/lambda [to-string ?] tokens
 ]
 
 Reader: make object! [
