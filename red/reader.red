@@ -61,11 +61,11 @@ Reader: make object! [
 	tokens: copy []
 	position: 1
 	next: function [] [
-		position: position + 1
+		self/position: self/position + 1
 		tokens/(position - 1)
 	]
 	peek: function[] [
-		tokens/(position)
+		tokens/(self/position)
 	]
 ]
 

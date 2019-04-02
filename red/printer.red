@@ -18,9 +18,10 @@ pr_str: function [
 	/print_readably "print out the string in a form that can be machine-read"
 ] [
 	;print_backup rejoin ["#####^/structure: " structure ", type: " type? structure  "^/#####^/"]
+    ?? structure
 	case [
 		logic? structure [to-string structure]
-		integer? structure [structure]
+		integer? structure [to-string structure]
 		string? structure [
 			either print_readably [
 				part_to_replace: copy/part next structure ((length? structure) - 2)

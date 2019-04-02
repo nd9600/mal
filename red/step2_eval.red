@@ -12,7 +12,6 @@ do %moduleLoader.red
 h: import/only %helpers.red [apply lambda f_map errorToString]
 
 do %types.red
-do %functional.red
 do %reader.red
 do %printer.red
 
@@ -71,6 +70,8 @@ EVAL: function [
 	env [map!] "the REPL environment"
 ] [
 	;print_backup rejoin ["#####^/ast1: " mold ast "^/#####^/"]
+    ?? ast
+    ?? env
 	case [
 		(logic? ast) or (integer? ast) or (string? ast) [eval_ast ast env]
 		not ast/is_type "MalList" [eval_ast ast env]
@@ -95,7 +96,10 @@ rep: function [
 	env [map!] "the REPL environment"
 ] [
 	if error? error: try [
-		return PRINT EVAL (READ str) env
+        ast: READ str
+        evaluatedAST: EVAL ast env
+        ?? evaluatedAST
+		return PRINT evaluatedAST
 	]  [
 		switch/default error/arg1 [
 			"blank line" [return ""] ; will print nothing if a blank line or a line with only a comment was entered

@@ -50,9 +50,9 @@ rep: function [
 	str [string!] "the input string"
 ] [
     ast: READ str
-    ?? ast
 	PRINT EVAL ast
 ]
+
 
 do %step1_tests.red
 
