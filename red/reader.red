@@ -2,6 +2,8 @@ Red [
     Title: "Red implementation of Reader for the Mal Lisp"
 ]
 
+keywordPrefix: #"^(29E)"
+
 tokenizer: function [
 	"lexes an input string"
 	str [string!] "the input string"
@@ -128,12 +130,21 @@ read_atom: function [
 
 	token: current_reader/peek
 	case [
+		(parse token [":" to end]) [read_keyword current_reader]
 		(parse token [opt "-" some digit]) [to-integer token]
 		(parse token string) [make_string token]
 		token == "nil" [make MalNil []]
 		(parse token ["true" | "false"]) [token == "true"]
 		true [make MalSymbol [data: token]]
 	]
+]
+
+read_keyword: function [
+    current_reader [object!] "the current reader"
+] [
+    token: current_reader/peek
+    keywordName: rejoin [keywordPrefix next token]
+    make MalSymbol [data: keywordName]
 ]
 
 make_string: function [
